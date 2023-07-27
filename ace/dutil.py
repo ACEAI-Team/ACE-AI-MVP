@@ -9,25 +9,45 @@ def import_data(path):
   outputs = data[:, -1]
   return inputs, outputs
 
-def line(image, x1, y1, x2, y2):
-  width = x2 - x1 + 1
-  height = y2 - y1
-  steps = np.arange(width + 1) * (height // width) + y1
+def line(image, point1, point2):
+  width = point2[0] - point1[0] + 1
+  height = point2[1] - point1[1]
+  steps = np.arange(width + 1) * (height // width) + point1[1]
   steps[-1] += height % width
-  for x, y in zip(range(x1, x2 + 1), steps):
-    return steps
+  print(width, steps)
+  sign = np.sign(height)
+  sign = sign if sign else 1
+  last = np.full((512, 256), -1)
+  for i in range(width):
+    start = steps[i]
+    end = steps[i + 1]
+    print('draw from', start, 'to', end + sign)
+    image[point1[0] + i, start:end + sign:sign] = 1
+    if (last == image).all():
+      print('NOTHING DRAWN')
+    last = np.copy(image)
+  return image
 
-def plotter(points, res):
-  image = np.zeros((res, res))
+def plotter(points, res=(512, 256)):
+  image = np.zeros(res)
+  for point1, point2 in zip(points, points[1:]):
+    print(point1, 'to', point2)
+    image = line(image, point1, point2)
+    #plt.imshow(image.T, origin='lower')
+    #plt.show()
+  return image
 
 def grapher(values, res=(512, 256)):
   width = values.shape[0]
   x = (np.arange(width) / (width - 1) * (res[0] - 1)).astype(np.int32)
   y = (values * (res[1] - 1)).astype(np.int32)
-  return x, y
+  points = np.column_stack((x, y))
+  return points
 
 
 inputs, outputs = import_data('../data/mitbih_test.csv')
-x, y = grapher(inputs[0])
-i = np.zeros((512, 256))
-steps = line(i, x[0], y[0], x[1], y[1])
+print('loaded data')
+points = grapher(inputs[0])
+image = plotter(points)
+plt.imshow(image.T, origin='lower')
+plt.show()
