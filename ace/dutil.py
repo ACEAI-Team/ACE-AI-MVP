@@ -14,24 +14,23 @@ def line(image, point1, point2):
   height = point2[1] - point1[1]
   steps = np.arange(width + 1) * (height // width) + point1[1]
   steps[-1] += height % width
-  print(width, steps)
   sign = np.sign(height)
   sign = sign if sign else 1
   last = np.full((512, 256), -1)
   for i in range(width):
+    col = point1[0] + i
     start = steps[i]
-    end = steps[i + 1]
-    print('draw from', start, 'to', end + sign)
-    image[point1[0] + i, start:end + sign:sign] = 1
+    end = steps[i + 1] + sign
+    image[col, start:end:sign] = 1
     if (last == image).all():
-      print('NOTHING DRAWN')
+      print(f'at {col} failed to draw from {start} to {end}\n\tsteps are {steps}')
     last = np.copy(image)
   return image
 
 def plotter(points, res=(512, 256)):
   image = np.zeros(res)
   for point1, point2 in zip(points, points[1:]):
-    print(point1, 'to', point2)
+    #print(point1, 'to', point2)
     image = line(image, point1, point2)
     #plt.imshow(image.T, origin='lower')
     #plt.show()
