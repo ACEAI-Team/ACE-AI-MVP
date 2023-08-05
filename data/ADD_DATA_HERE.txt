@@ -1,2 +1,8 @@
 Please add the two still graph dataset csv files here using this url:
 https://drive.google.com/drive/folders/1H-ET1LKI91aCPpw5ds6g87eUXTdl6yVM?usp=sharing
+types:
+0	Non-ectopic beats
+1	Supraventricular ectopic beats
+2	Ventricular ectopic beats
+3	Fusion Beats
+4	Unknown Beats
