@@ -9,44 +9,44 @@ def import_data(path):
   outputs = data[:, -1]
   return inputs, outputs
 
-def line(image, point1, point2):
-  width = point2[0] - point1[0] + 1
-  height = point2[1] - point1[1]
-  steps = np.arange(width + 1) * (height // width) + point1[1]
-  steps[-1] += height % width
-  sign = np.sign(height)
-  sign = sign if sign else 1
-  last = np.full((512, 256), -1)
-  for i in range(width):
-    col = point1[0] + i
-    start = steps[i]
-    end = steps[i + 1] + sign
-    image[col, start:end:sign] = 1
-    if (last == image).all():
-      print(f'at {col} failed to draw from {start} to {end}\n\tsteps are {steps}')
-    last = np.copy(image)
-  return image
+def plot_sect(res, vals, max_val=1):
+	max_x, max_y = res
+	val_len = vals.shape[0]
+	x = np.arange(val_len) / (val_len - 1) * (max_x - 1)
+	y = vals / max_val * (max_y - 1)
+	points = np.stack((x, y), axis=-1)
+	sects = np.stack((points[:-1], points[1:]), axis=-2)
+	return sects.astype(np.int64)
 
-def plotter(points, res=(512, 256)):
-  image = np.zeros(res)
-  for point1, point2 in zip(points, points[1:]):
-    #print(point1, 'to', point2)
-    image = line(image, point1, point2)
-    #plt.imshow(image.T, origin='lower')
-    #plt.show()
-  return image
+def draw_line(max_range, points):
+	point_dif = np.diff(points, axis=0)[0]
+	swap_axes = abs(point_dif[1]) > point_dif[0]
+	if swap_axes:
+		points = np.flip(points, axis=-1)
+		point_dif = np.flip(point_dif)
+	slope = point_dif[1] / point_dif[0]
+	y_int = points[0][1] - slope * points[0][0]
+	sign = -1 if point_dif[0] < 0 else 1
+	x = max_range[int(points[0][0]): int(points[1][0]): sign].astype(np.int64)
+	y = (x * slope + y_int).astype(np.int64)
+	if swap_axes:
+		return y, x
+	return x, y
+v_draw_line = np.vectorize(draw_line, signature='(a),(b,c)->(),()', otypes=[np.ndarray, np.ndarray])
 
-def grapher(values, res=(512, 256)):
-  width = values.shape[0]
-  x = (np.arange(width) / (width - 1) * (res[0] - 1)).astype(np.int32)
-  y = (values * (res[1] - 1)).astype(np.int32)
-  points = np.column_stack((x, y))
-  return points
-
+def graph(res, vals, max_val=1):
+	max_range = np.arange(res[0] if res[0] > res[1] else res[1])
+	points = plot_sect(res, vals, max_val)
+	x, y = v_draw_line(max_range, points)
+	x = np.hstack(x)
+	y = np.hstack(y)
+	canvas = np.zeros(res)
+	canvas[x, y] = 1
+	canvas[*points[-1, -1]] = 1
+	return canvas
 
 inputs, outputs = import_data('../data/mitbih_test.csv')
 print('loaded data')
-points = grapher(inputs[0])
-image = plotter(points)
+image = graph((512, 512), inputs[0])
 plt.imshow(image.T, origin='lower')
 plt.show()
