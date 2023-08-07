@@ -14,9 +14,9 @@ def plot_sect(res, vals, max_val=1):
 	val_len = vals.shape[0]
 	x = np.arange(val_len) / (val_len - 1) * (max_x - 1)
 	y = vals / max_val * (max_y - 1)
-	points = np.stack((x, y), axis=-1)
+	points = np.stack((x, y), axis=-1).astype(np.int64)
 	sects = np.stack((points[:-1], points[1:]), axis=-2)
-	return sects.astype(np.int64)
+	return sects
 
 def draw_line(max_range, points):
 	point_dif = np.diff(points, axis=0)[0]
@@ -27,7 +27,7 @@ def draw_line(max_range, points):
 	slope = point_dif[1] / point_dif[0]
 	y_int = points[0][1] - slope * points[0][0]
 	sign = -1 if point_dif[0] < 0 else 1
-	x = max_range[int(points[0][0]): int(points[1][0]): sign].astype(np.int64)
+	x = max_range[points[0][0]: points[1][0]: sign]
 	y = (x * slope + y_int).astype(np.int64)
 	if swap_axes:
 		return y, x
@@ -35,7 +35,7 @@ def draw_line(max_range, points):
 v_draw_line = np.vectorize(draw_line, signature='(a),(b,c)->(),()', otypes=[np.ndarray, np.ndarray])
 
 def graph(res, vals, max_val=1):
-	max_range = np.arange(res[0] if res[0] > res[1] else res[1])
+	max_range = np.arange(res[0] if res[0] > res[1] else res[1], dtype=np.int64)
 	points = plot_sect(res, vals, max_val)
 	x, y = v_draw_line(max_range, points)
 	x = np.hstack(x)
@@ -44,6 +44,7 @@ def graph(res, vals, max_val=1):
 	canvas[x, y] = 1
 	canvas[*points[-1, -1]] = 1
 	return canvas
+v_graph = np.vectorize(graph, signature='(2),(a),()->(b,c)')
 
 inputs, outputs = import_data('../data/mitbih_test.csv')
 print('loaded data')
