@@ -46,8 +46,27 @@ def graph(res, vals, max_val=1):
 	return canvas
 v_graph = np.vectorize(graph, signature='(2),(a),()->(b,c)')
 
+"""
 inputs, outputs = import_data('../data/mitbih_test.csv')
 print('loaded data')
-image = graph((512, 512), inputs[0])
+image = graph((256, 256), inputs[0])
 plt.imshow(image.T, origin='lower')
 plt.show()
+"""
+
+if __name__ == '__main__':
+  in_dir = input('Input Dir (to csv file): ')
+  out_dir = input('Output Dir (.npy save file): ')
+  res = eval(input('Image resolution: '))
+  print('Importing data...')
+  inputs, outputs = import_data(in_dir)
+  graph_amount = len(outputs)
+  batch = int(input(f'Imported {graph_amount} graphs\nBatch Amount (how many to convert at a time): '))
+  with open(out_dir, 'wb') as f:
+    for b in range(0, graph_amount, batch):
+      print(f'Converting batch {b}/graph_amount...')
+      images = v_graph(res, inputs[b: b + batch], 1)
+      data = np.array((images, outputs[b: b + batch]), dtype=np.object)
+      np.save(f, data)
+      print(f'Saved batch {b}.')
+  print('FINISHED!')
