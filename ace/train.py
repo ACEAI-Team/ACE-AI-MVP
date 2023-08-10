@@ -38,7 +38,7 @@ for epoch in range(epochs):
   with torch.no_grad():
     correct = 0
     total = 0
-    loop = tqdm(test_loader, total=len(train_loader), leave=True)
+    loop = tqdm(test_loader, total=len(test_loader), leave=True)
     for images, labels in loop:
       images = images.to(device)
       labels = labels.to(device)
@@ -46,5 +46,6 @@ for epoch in range(epochs):
       _, predicted = outputs.max(1)
       total += labels.size(0)
       correct += predicted.eq(labels).sum().item()
+      loop.set_postfix(accuracy=100 * correct / total)
     print(f"Test Accuracy: {100 * correct / total:.2f}%")
 print("Training complete!")
