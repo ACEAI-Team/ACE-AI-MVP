@@ -34,6 +34,7 @@ for epoch in range(epochs):
     optimizer.step()
     loop.set_postfix(loss=loss.item())
   print(f"Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.4f}")
+  torch.save(model.state_dict(), 'model.ckpt')
   model.eval()
   with torch.no_grad():
     correct = 0
@@ -46,6 +47,6 @@ for epoch in range(epochs):
       _, predicted = outputs.max(1)
       total += labels.size(0)
       correct += predicted.eq(labels).sum().item()
-      loop.set_postfix(accuracy=100 * correct / total)
+      loop.set_postfix(accuracy=f'{100 * correct / total:.2f}%')
     print(f"Test Accuracy: {100 * correct / total:.2f}%")
 print("Training complete!")
