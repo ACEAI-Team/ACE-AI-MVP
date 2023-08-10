@@ -60,7 +60,7 @@ if __name__ == '__main__':
   graph_amount = len(outputs)
   batch = int(input(f'Imported {graph_amount} graphs\nBatch Amount (how many to convert at a time): '))
   with h5py.File(out_dir + '.h5', 'a') as f:
-    dset_out = f.create_dataset('outputs', data=outputs, chunks=True)
+    dset_out = f.create_dataset('outputs', data=outputs.astype(np.int64), chunks=True)
     dset_in = f.create_dataset('inputs', shape=(graph_amount,) + res, chunks=True)
     for b in range(0, graph_amount, batch):
       print(f'Converting batch {b}/{graph_amount}...')

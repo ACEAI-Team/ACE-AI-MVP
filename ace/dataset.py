@@ -12,5 +12,6 @@ class ECGDataset(Dataset):
 
   def __getitem__(self, index):
     with h5py.File(self.dset_dir, 'r') as f:
-      inputs =  torch.tensor(f['inputs'][index])
-      outputs =  torch.tensor(f['outputs'][index])
+      inputs = torch.tensor(f['inputs'][index])
+      outputs = torch.tensor(f['outputs'][index])
+    return inputs.unsqueeze(0), outputs

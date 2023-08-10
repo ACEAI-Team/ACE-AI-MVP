@@ -2,28 +2,32 @@ import torch
 from torch import nn
 
 def flatten(x):
-  return x.view(x.size(0), -1)
+  return x.view(-1)
 
 class CNN(nn.Module):
-    def __init__(self, num_classes=10):
-        super(CNN, self).__init__()
-        self.dropout = nn.Dropout(0.5)
-        self.layers = [
-          nn.Conv2d(1, 32, kernel_size=5, padding=2, in_channels=1),
-          nn.ReLU(),
-          nn.Conv2d(32, 64, kernel_size=3, padding=1, in_channels=1),
-          nn.ReLU(),
-          nn.MaxPool2d(kernel_size=2, stride=2),
-          nn.Conv2d(64, 128, kernel_size=3, padding=1, in_channels=1),
-          nn.ReLU(),
-          nn.MaxPool2d(kernel_size=2, stride=2),
-          nn.Linear(64 * 49 * 49, 512),
-          nn.ReLU(),
-          self.dropout,
-          nn.Linear(512, num_classes)
-        ]
-    def forward(self, x):
-      for layer in self.layers:
-        x = layer(x)
-      return x
+  def __init__(self, num_classes=5):
+    super(CNN, self).__init__()
+    self.layers = nn.Sequential(
+      nn.Conv2d(1, 32, kernel_size=5, padding=2),
+      nn.LeakyReLU(),
+      nn.MaxPool2d(kernel_size=2, stride=2),
+      nn.Conv2d(32, 64, kernel_size=3, padding=1),
+      nn.LeakyReLU(),
+      nn.MaxPool2d(kernel_size=2, stride=2),
+      nn.Conv2d(64, 128, kernel_size=3, padding=1),
+      nn.LeakyReLU(),
+      nn.MaxPool2d(kernel_size=2, stride=2),
+      nn.Flatten(),
+      nn.Linear(128 * 32 * 32, 1024),
+      nn.LeakyReLU(),
+      nn.Dropout(0.5),
+      nn.Linear(1024, 512),
+      nn.LeakyReLU(),
+      nn.Dropout(0.5),
+      nn.Linear(512, num_classes),
+      nn.Softmax(dim=1)
+    )
+  def forward(self, x):
+    x = self.layers(x)
+    return x
 
