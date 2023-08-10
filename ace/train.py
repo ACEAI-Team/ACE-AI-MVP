@@ -13,8 +13,10 @@ epochs = 5
 
 print('Initializing AI stuff...')
 model = model.CNN().to(device)
-train_dataset = dataset.ECGDataset('../data/simg/train.h5')
-test_dataset = dataset.ECGDataset('../data/simg/test.h5')
+model.load_state_dict(torch.load(input('Model file dir: ')))
+data_dir = input('Data dir: ')
+train_dataset = dataset.ECGDataset(f'{data_dir}/train.h5')
+test_dataset = dataset.ECGDataset(f'{data_dir}/test.h5')
 train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
