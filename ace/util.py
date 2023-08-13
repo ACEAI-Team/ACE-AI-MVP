@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import h5py
+import torch
 
 
 def import_data(path):
@@ -40,14 +41,29 @@ def graph(res, vals, max_val=1):
   x, y = v_draw_line(max_range, points)
   x = np.hstack(x)
   y = np.hstack(y)
-  canvas = np.zeros(res)
-  canvas[x, y] = 1
-  canvas[*points[-1, -1]] = 1
+  canvas = np.zeros(res, bool)
+  canvas[x, y] = True
+  canvas[*points[-1, -1]] = True
   return canvas
 v_graph = np.vectorize(graph, signature='(2),(a),()->(b,c)')
 
 def show_img(image):
   plt.imshow(image.T, origin='lower')
+  plt.show()
+
+def show_vis(tensor, num_columns=8, label='Feature Map'):
+  tensor = tensor.cpu().detach()
+  tensor = tensor - torch.min(tensor)
+  tensor = tensor / torch.max(tensor)
+  num_kernels = tensor.shape[0]
+  num_rows = 1 + num_kernels // num_columns
+  fig = plt.figure(figsize=(num_columns, num_rows))
+  for i in range(tensor.shape[0]):
+    ax1 = fig.add_subplot(num_rows, num_columns, i+1)
+    ax1.imshow(tensor[i].T, origin='lower')  # Assumes kernels are grayscale
+    ax1.axis('off')
+    ax1.set_title(f'{label} {i}')
+  plt.subplots_adjust(wspace=0.1, hspace=0.5)
   plt.show()
 
 
@@ -60,8 +76,8 @@ if __name__ == '__main__':
   graph_amount = len(outputs)
   batch = int(input(f'Imported {graph_amount} graphs\nBatch Amount (how many to convert at a time): '))
   with h5py.File(out_dir + '.h5', 'a') as f:
-    dset_out = f.create_dataset('outputs', data=outputs.astype(np.int64), chunks=True)
-    dset_in = f.create_dataset('inputs', shape=(graph_amount,) + res, chunks=True)
+    dset_out = f.create_dataset('outputs', data=outputs.astype(np.int8), chunks=True)
+    dset_in = f.create_dataset('inputs', dtype=bool, shape=(graph_amount,) + res, chunks=True)
     for b in range(0, graph_amount, batch):
       print(f'Converting batch {b}/{graph_amount}...')
       images = v_graph(res, inputs[b: b + batch], 1)

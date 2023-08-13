@@ -1,0 +1,11 @@
+{
+'gpu': True,
+'learning rate': 0.001,
+'batch size': 128,
+'epochs': 200,
+'model': '',
+'half': False,
+'training data': 'train.h5',
+'test data': 'test.h5',
+'num_workers': 4
+}
