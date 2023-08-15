@@ -31,7 +31,8 @@ def vistream(stream):
 def predictor():
     categories = ['Non-ecotopiic beats', 'Supraventricular ectopic beats', 'Ventricular ectopic beats', 'Fusion Beats', 'Unknown Beats']
     while 1:
-        inputs = np.array(stream[-187:])
+        inputs = np.array(stream[-300:])
+        inputs = torch.nn.functional.avg_pool1d(inputs.unsqueeze(0), kernel_size=12, stride=1)[0]
         inputs -= inputs.min()
         in_max = inputs.max()
         inputs /= in_max if in_max else 1.
