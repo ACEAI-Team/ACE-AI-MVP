@@ -29,9 +29,12 @@ def vistream(stream):
     return message
 
 def predictor():
-    categories = ['Non-ecotic beats', 'Supraventricular ectopic beats', 'Ventricular ectopic beats', 'Fusion Beats', 'Unknown Beats']
+    categories = ['Non-ecotopiic beats', 'Supraventricular ectopic beats', 'Ventricular ectopic beats', 'Fusion Beats', 'Unknown Beats']
     while 1:
-        inputs = np.array(stream[-187:])/100
+        inputs = np.array(stream[-187:])
+        inputs -= inputs.min()
+        in_max = inputs.max()
+        inputs /= in_max if in_max else 1.
         image = torch.tensor(util.graph((256, 256), inputs)).float()
         with torch.no_grad():
           logits = cnn(image.unsqueeze(0).unsqueeze(0))
