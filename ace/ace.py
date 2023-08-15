@@ -34,7 +34,7 @@ def predictor():
         inputs = torch.tensor(stream[-320:])
         inputs = torch.nn.functional.avg_pool1d(inputs.unsqueeze(0), kernel_size=12, stride=1)[0]
         inputs -= inputs.min()
-        in_max = inputs.max()
+        in_max = inputs.max().float()
         inputs /= in_max if in_max else 1.
         image = torch.tensor(util.graph((256, 256), inputs)).float()
         with torch.no_grad():
