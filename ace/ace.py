@@ -32,7 +32,7 @@ def predictor():
     categories = ['Non-ecotopiic beats', 'Supraventricular ectopic beats', 'Ventricular ectopic beats', 'Fusion Beats', 'Unknown Beats']
     while 1:
         inputs = torch.tensor(stream[-320:])
-        inputs = torch.nn.functional.avg_pool1d(inputs.unsqueeze(0), kernel_size=12, stride=1)[0]
+        inputs = torch.nn.functional.avg_pool1d(inputs.unsqueeze(0), kernel_size=12, stride=1)[0].float()
         inputs -= inputs.min()
         in_max = inputs.max().float()
         inputs /= in_max if in_max else 1.
