@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Cardio</title>
+    <style>
+        body {
+	    display: flex;
+	    flex-direction: column;
+	    justify-content: center;
+	    align-items: center;
+	    height: 100vh;
+	    background-color: #ffffff;
+	}
+
+	.chart-container {
+	    display: flex;
+	    align-items: center; /* Vertically center the chart and the legend */
+	}
+
+	.pie-chart {
+	    width: 200px;
+	    height: 200px;
+	    border-radius: 50%;
+	    background: conic-gradient(
+		#60ff47 0% 40%,
+		#ff4747 40% 65%,
+		#ffed47 65% 100%
+	    );
+	    position: relative;
+	    margin-right: 20px; /* Add some spacing between the chart and the legend */
+	}
+
+	.pie-chart::before {
+	    content: "";
+	    position: absolute;
+	    top: 10%;
+	    left: 10%;
+	    width: 80%;
+	    height: 80%;
+	    background-color: #ffffff;
+	    border-radius: 50%;
+	}
+
+	.chart-legend {
+	    display: flex;
+	    flex-direction: column;
+	}
+
+	.legend-item {
+	    display: flex;
+	    align-items: center;
+	    margin-bottom: 10px; /* Add spacing between legend items */
+	}
+
+	.color-box {
+	    width: 20px;
+	    height: 20px;
+	    border-radius: 4px;
+	    margin-right: 10px; /* Spacing between the color box and the percentage text */
+	}
+	.graph-container {
+	    margin-top: 40px;  /* Adds some spacing above the graph */
+	}
+
+	.line-graph {
+	    width: 100%;  /* You can adjust this */
+	    height: auto;
+	    display: block;
+	    margin: 0 auto;  /* Centers the graph on the page */
+	}
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+	<div class="pie-chart"></div>
+	<div class="chart-legend">
+	    <div class="legend-item">
+		<span class="color-box" style="background-color: #60ff47;"></span> 40%
+	    </div>
+	    <div class="legend-item">
+		<span class="color-box" style="background-color: #ff4747;"></span> 25%
+	    </div>
+	    <div class="legend-item">
+		<span class="color-box" style="background-color: #ffed47;"></span> 35%
+	    </div>
+	</div>
+    </div>
+    <div class="graph-container">
+      <svg viewBox="0 0 {{ ecg_w }} {{ ecg_h }}" class="line-graph">
+	    <!-- Horizontal grid lines -->
+	    <line x1="0" y1="0" x2="{{ ecg_w }}" y2="0" stroke="#ccc" />
+	    <line x1="0" y1="{{ ecg_h }}" x2="{{ ecg_w }}" y2="{{ ecg_h }}" stroke="#ccc" />
+	    
+	    <!-- Line graph path. Modify this to adjust your line. -->
+	    <path d="{{ line }}" fill="none" stroke="black" stroke-width="2" />
+	</svg>
+    </div>
+</body>
+</html>
+
